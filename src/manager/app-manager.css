@@ -6,10 +6,11 @@
   width: 100%;
   margin: 0 auto;
   list-style-type: none;
+  transition: all 0.3s ease;
 }
 .tasks-heading {
   text-align: center;
-  margin-bottom: 80px;
+  margin-bottom: 50px;
   font-size: 1.8rem;
   font-weight: 600;
   font-family: 'lumanosimo';
@@ -24,7 +25,6 @@
   border-radius: 6px;
   color: #111;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-
   gap: 15px;
 }
 
@@ -97,6 +97,10 @@ span.custom-checkbox-display {
   flex-direction: column;
   gap: 5px;
 }
+.task-details {
+  display: flex;
+  justify-content: space-between;
+}
 
 .task-item.completed .first-para span,
 .task-item.completed .second-para span {
@@ -110,20 +114,25 @@ span.custom-checkbox-display {
 
 .first-para {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
   margin: 0;
+  max-width: 60%;
+  text-wrap: wrap;
 }
 .first-para span:first-of-type {
   font-family: 'lumanosimo', cursive;
   font-size: 1.1em;
   font-weight: 500;
-  flex-grow: 1;
   white-space: nowrap;
+  overflow-wrap: anywhere;
   overflow: hidden;
   text-overflow: ellipsis;
   text-wrap: wrap;
+  align-self: start;
 }
 
 .time-pill {
@@ -145,19 +154,23 @@ span.custom-checkbox-display {
 
 .second-para {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   gap: 10px;
   margin: 0;
 }
-.second-para span:first-of-type {
+.second-para > * {
+  max-width: 100px;
+}
+.first-para span:last-of-type {
   font-size: 0.85rem;
-  color: #bbb;
+  color: #666;
   font-family: 'lugrasimo', cursive;
   flex-grow: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  align-self: start;
+  text-wrap: wrap;
 }
 
 .date-pill {
@@ -180,6 +193,25 @@ span.custom-checkbox-display {
 }
 
 @media (max-width: 600px) {
+  .task-item {
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 15px;
+  }
+
   .task-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 12px;
+  }
+  .first-para {
+    grid-column: span 2;
+    max-width: 100%;
+    gap: 3px;
+  }
+  .second-para {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: 100px 100px;
   }
 }
