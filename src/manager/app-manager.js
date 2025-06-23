@@ -498,6 +498,13 @@ function updateProjectTaskCounts() {
   })
 }
 
+function getRandomGradient() {
+  const angle = Math.floor(Math.random() * 360)
+  const color1 = `hsl(${Math.floor(Math.random() * 200)}, 70%, 70%)`
+  const color2 = `hsl(${Math.floor(Math.random() * 200)}, 70%, 70%)`
+  return `linear-gradient(${angle}deg, ${color1}, ${color2})`
+}
+
 function renderTasks() {
   taskList.innerHTML = ''
   if (!activeProject) {
@@ -517,9 +524,9 @@ function renderTasks() {
       activeProject === scheduledProject ||
       activeProject === overdueProject
     ) {
-      noTasksMessage.textContent = `No tasks "${activeProject.title}".`
+      noTasksMessage.textContent = `You have no tasks "${activeProject.title}".`
     } else {
-      noTasksMessage.textContent = `No tasks in "${activeProject.title}".`
+      noTasksMessage.textContent = `You have no tasks in "${activeProject.title}".`
     }
     taskList.appendChild(noTasksMessage)
   } else {
@@ -534,6 +541,7 @@ function renderTasks() {
 
       const li = document.createElement('li')
       li.classList.add('task-item')
+      li.style.backgroundImage = getRandomGradient()
 
       const taskCheckboxWrapper = document.createElement('div')
       taskCheckboxWrapper.classList.add('task-checkbox-wrapper')
@@ -609,9 +617,6 @@ function renderTasks() {
       timePillSpan.appendChild(timeImage)
       timePillSpan.appendChild(timeTextSpan)
 
-      firstPara.appendChild(titleSpan)
-      firstPara.appendChild(timePillSpan)
-
       const secondPara = document.createElement('p')
       secondPara.classList.add('second-para')
 
@@ -627,7 +632,10 @@ function renderTasks() {
         descriptionSpan.textContent = descriptionContent || ''
       }
 
-      secondPara.appendChild(descriptionSpan)
+      firstPara.appendChild(titleSpan)
+      firstPara.appendChild(descriptionSpan)
+
+      secondPara.appendChild(timePillSpan)
       secondPara.appendChild(datePillSpan)
 
       taskDetailsContainer.appendChild(firstPara)
