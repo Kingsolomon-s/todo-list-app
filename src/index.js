@@ -16,7 +16,7 @@ function toggleSidebar() {
     setTimeout(() => {
       overlay.classList.add('active')
       sideBar.classList.remove('hidden-children')
-    }, 300)
+    }, 200)
   }
 }
 
