@@ -183,4 +183,7 @@ div.add-project {
   .overlay.active {
     transform: translateY(0);
   }
+  .add-task-btn {
+    margin-bottom: 50px;
+  }
 }
