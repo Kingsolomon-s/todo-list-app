@@ -1,0 +1,185 @@
+@import url('https://fonts.googleapis.com/css2?family=Lugrasimo&family=Lumanosimo&family=Merienda:wght@300..900&family=Nothing+You+Could+Do&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Sorts+Mill+Goudy:ital@0;1&display=swap');
+
+#task-list {
+  padding: 10px;
+  max-width: 700px;
+  width: 100%;
+  margin: 0 auto;
+  list-style-type: none;
+}
+.tasks-heading {
+  text-align: center;
+  margin-bottom: 80px;
+  font-size: 1.8rem;
+  font-weight: 600;
+  font-family: 'lumanosimo';
+}
+
+.task-item {
+  display: flex;
+  align-items: flex-start;
+  /* background-color: #444; */
+  padding: 15px 20px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  color: #111;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+
+  gap: 15px;
+}
+
+.task-checkbox-wrapper {
+  flex-shrink: 0;
+}
+
+.custom-checkbox-label {
+  display: block;
+  cursor: pointer;
+  position: relative;
+}
+
+.task-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+span.custom-checkbox-display {
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  background-color: #e6ebeb;
+  border: 1px solid #444 !important;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
+  flex-shrink: 0;
+}
+
+.task-checkbox:checked + .custom-checkbox-display {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.task-checkbox:checked + .custom-checkbox-display::after {
+  content: '';
+  display: block;
+  width: 2px;
+  height: 7px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%) rotate(45deg);
+  opacity: 1;
+}
+
+.task-checkbox:focus + .custom-checkbox-display {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+}
+
+.task-body {
+  flex-grow: 1;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.task-item.completed .first-para span,
+.task-item.completed .second-para span {
+  text-decoration: line-through;
+  color: #888;
+}
+.task-item.completed .time-pill,
+.task-item.completed .date-pill {
+  color: #888;
+}
+
+.first-para {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+.first-para span:first-of-type {
+  font-family: 'lumanosimo', cursive;
+  font-size: 1.1em;
+  font-weight: 500;
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-wrap: wrap;
+}
+
+.time-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: lightsteelblue;
+  border-radius: 12px;
+  padding: 4px 8px;
+  font-family: 'poppins', sans-serif;
+  font-size: 0.85em;
+  color: #333;
+  flex-shrink: 0;
+}
+.time-pill img {
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.second-para {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+.second-para span:first-of-type {
+  font-size: 0.85rem;
+  color: #bbb;
+  font-family: 'lugrasimo', cursive;
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.date-pill {
+  background-color: peachpuff;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-family: 'poppins', sans-serif;
+  font-size: 0.85em;
+  color: #444;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.no-tasks-message {
+  text-align: center;
+  padding: 20px;
+  color: #aaa;
+  font-style: italic;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 600px) {
+  .task-details {
+  }
+}
