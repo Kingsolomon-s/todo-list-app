@@ -8,13 +8,14 @@
 
 html,
 body {
-  height: 100%;
-  overflow: hidden;
+  /* height: 100%; */
+  /* overflow: hidden; */
 }
 body {
   font-family: 'Sorts+Mill+Goudy';
   background-color: #ebe6e6;
   padding: 0;
+  position: relative;
 }
 .hamburger-btn {
   background: none;
@@ -46,10 +47,11 @@ body {
   min-height: 100vh;
   background-color: rgba(51, 51, 51, 0.1);
   backdrop-filter: blur(2rem);
-  width: 270px;
+  width: 250px;
   transition: all 0.2s ease;
   flex-shrink: 0;
   z-index: 1000;
+  position: relative;
 }
 #sidebar-container.close {
   padding: 0px;
@@ -68,7 +70,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 60px;
-  position: relative;
   padding: 20px 1.2em 1em 1em;
   align-self: self-start;
   font-size: 0.95rem;
@@ -99,10 +100,55 @@ body {
   padding: 0.4em 0.8em 0.4em 0.5em;
   transition: all 0.3s ease;
 }
+.pop-up-btn {
+  display: none;
+}
+.pop-up {
+  position: absolute;
+  background-color: #666;
+  padding: 0;
+  border-radius: 8px;
+  z-index: 2000;
+  display: none;
+}
+.pop-up > * {
+  padding: 8px 30px;
+  cursor: pointer;
+  text-align: center;
+}
+.pop-up > :hover {
+  background-color: #999;
+}
+.pop-up > :first-child {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+.pop-up > :last-child {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
 .test > div:focus,
 .test > div:hover {
   background-color: #777;
   border-radius: 10px;
+}
+.projects.test > {
+  position: relative;
+}
+.projects.test > :focus,
+.projects.test > :hover {
+  .pop-up-btn {
+    display: block;
+    height: 25px;
+  }
+
+  .pop-up-btn img {
+    vertical-align: center;
+    margin-left: auto;
+  }
+  .number {
+    display: none;
+  }
 }
 .test > div > p:first-of-type {
   flex-grow: 1;
@@ -147,6 +193,58 @@ div.add-project {
   padding-right: 10px;
 }
 
+#modifyProjectDialog {
+  margin: auto;
+  padding: 1.5em;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  border: none;
+  border-radius: 10px;
+  height: 200px;
+  width: 310px;
+  background-color: #333;
+  color: #eee;
+}
+#modifyProjectForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+#modifyProjectForm h2 {
+  font-size: 1.4rem;
+  text-align: center;
+  font-family: 'poppins';
+}
+
+.modifyProjectMenu {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+.modifyProjectMenu > * {
+  padding: 8px 10px;
+  flex: 1;
+  border-radius: 8px;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+.modifyProjectMenu > :first-child {
+  background-color: #dc3545;
+}
+.modifyProjectMenu > :last-child {
+  background-color: #28a745;
+}
+.modifyProjectMenu > :first-child:hover,
+.modifyProjectMenu > :first-child:focus {
+  background-color: #c82333;
+}
+.modifyProjectMenu > :last-child:hover,
+.modifyProjectMenu > :last-child:focus {
+  background-color: #218838;
+}
+
 .add-task-btn {
   border: none;
   font-size: 1rem;
@@ -164,6 +262,9 @@ div.add-project {
 .add-task-btn:hover {
   background-color: #000;
 }
+.hamburger-btn .hamburger-svg {
+  display: none;
+}
 
 @media (max-width: 768px) {
   #sidebar-container {
@@ -173,9 +274,6 @@ div.add-project {
     max-width: 250px;
   }
   #side-bar {
-    position: fixed;
-    left: 0;
-    top: 60px;
     max-width: 250px;
     width: 100%;
   }
@@ -185,5 +283,26 @@ div.add-project {
   }
   .add-task-btn {
     margin-bottom: 50px;
+  }
+  .hamburger-btn svg {
+    display: none;
+  }
+
+  #hamburger.open {
+    .cancel-svg {
+      display: block;
+    }
+    .hamburger-svg {
+      display: none;
+    }
+  }
+
+  #hamburger.close {
+    .hamburger-svg {
+      display: block;
+    }
+    .cancel-svg {
+      display: none;
+    }
   }
 }
