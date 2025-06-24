@@ -12,7 +12,11 @@ function toggleSidebar() {
   if (sideBar.classList.contains('close')) {
     overlay.classList.remove('active')
     sideBar.classList.add('hidden-children')
+    toggleButton.classList.remove('open')
+    toggleButton.classList.add('close')
   } else {
+    toggleButton.classList.add('open')
+    toggleButton.classList.remove('close')
     setTimeout(() => {
       overlay.classList.add('active')
       sideBar.classList.remove('hidden-children')
