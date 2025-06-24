@@ -3,6 +3,7 @@ import createTodoDialog from '../dialog/dialog.js'
 import createProject from '../project/projectFactory.js'
 import folderImg from '../images/folder-file-svgrepo-com.svg'
 import timeSvg from './images/alarm-clock-svgrepo-com.svg'
+import popUpSvg from '../images/menu-dots-svgrepo-com.svg'
 import './app-manager.css'
 
 let allApplicationTasks = []
@@ -37,8 +38,19 @@ const allTasksProject = createProject('All Tasks')
 allTasksProject.getTasks = () => allApplicationTasks
 
 const groceryProject = createProject('Grocery')
+groceryProject.isStatic = true
+groceryProject.originalTitle = 'Grocery'
+groceryProject.isDefaultRemovable = true
+
 const educationalProject = createProject('Educational')
+educationalProject.isStatic = true
+educationalProject.originalTitle = 'Educational'
+educationalProject.isDefaultRemovable = true
+
 const personalNotesProject = createProject('Personal Notes')
+personalNotesProject.isStatic = true
+personalNotesProject.originalTitle = 'Personal Notes'
+personalNotesProject.isDefaultRemovable = true
 
 let projectList
 let taskList
@@ -117,45 +129,84 @@ function loadAllData() {
       allApplicationTasks = []
     }
 
-    const storedProjectTitles = localStorage.getItem(
+    const storedProjectStates = localStorage.getItem(
       'allProjectsAndTaskCategories',
     )
-    const loadedProjectTitles = storedProjectTitles
-      ? JSON.parse(storedProjectTitles)
+    const loadedProjectStates = storedProjectStates
+      ? JSON.parse(storedProjectStates)
       : []
+
+    const storedDeletedDefaultTitles = localStorage.getItem(
+      'deletedDefaultRemovableProjectTitles',
+    )
+    const deletedDefaultRemovableProjectTitles = storedDeletedDefaultTitles
+      ? new Set(JSON.parse(storedDeletedDefaultTitles))
+      : new Set()
 
     allProjectsAndTaskCategories = [
       todayProject,
       scheduledProject,
       overdueProject,
       allTasksProject,
-      groceryProject,
-      educationalProject,
-      personalNotesProject,
     ]
 
-    loadedProjectTitles.forEach((projData) => {
-      const isAlreadyDefined = allProjectsAndTaskCategories.some(
-        (p) => p.title === projData.title,
-      )
+    const defaultStaticProjectsMap = new Map([
+      ['Grocery', groceryProject],
+      ['Educational', educationalProject],
+      ['Personal Notes', personalNotesProject],
+    ])
 
-      if (!isAlreadyDefined) {
+    const loadedDefaultRemovableProjectTitles = new Set()
+
+    loadedProjectStates.forEach((projData) => {
+      if (
+        projData.isStatic &&
+        projData.originalTitle &&
+        defaultStaticProjectsMap.has(projData.originalTitle)
+      ) {
+        if (!deletedDefaultRemovableProjectTitles.has(projData.originalTitle)) {
+          const staticProjectInstance = defaultStaticProjectsMap.get(
+            projData.originalTitle,
+          )
+          if (staticProjectInstance) {
+            staticProjectInstance.title = projData.title // Update its title if renamed
+            allProjectsAndTaskCategories.push(staticProjectInstance)
+          }
+        }
+      } else if (!projData.isStatic) {
         const newProject = createProject(projData.title)
         allProjectsAndTaskCategories.push(newProject)
       }
     })
 
-    allProjectsAndTaskCategories.forEach((project) => {
+    defaultStaticProjectsMap.forEach((projectInstance, originalTitle) => {
+      const isAlreadyPresent = allProjectsAndTaskCategories.some(
+        (p) => p === projectInstance,
+      )
       if (
-        ![
-          todayProject,
-          scheduledProject,
-          overdueProject,
-          allTasksProject,
-        ].includes(project)
+        !deletedDefaultRemovableProjectTitles.has(originalTitle) &&
+        !isAlreadyPresent
       ) {
-        if (project.getTasks().length > 0) {
-          project.getTasks().length = 0
+        projectInstance.title = originalTitle
+        allProjectsAndTaskCategories.push(projectInstance)
+      }
+    })
+
+    allProjectsAndTaskCategories = Array.from(
+      new Set(allProjectsAndTaskCategories),
+    )
+
+    allProjectsAndTaskCategories.forEach((project) => {
+      const isSystemCategory = [
+        todayProject,
+        scheduledProject,
+        overdueProject,
+        allTasksProject,
+      ].includes(project)
+
+      if (!isSystemCategory) {
+        if (project.tasks) {
+          project.tasks = []
         }
 
         allApplicationTasks
@@ -172,14 +223,13 @@ function loadAllData() {
     }
 
     if (!activeProject) {
-      activeProject = groceryProject
+      activeProject = allTasksProject
     }
   } catch (e) {
     console.error(
       'Error loading data from localStorage, resetting app state:',
       e,
     )
-    // Fallback to initial default state if loading fails or data is corrupt
     allApplicationTasks = []
     allProjectsAndTaskCategories = [
       todayProject,
@@ -200,10 +250,32 @@ function saveAllData() {
     JSON.stringify(allApplicationTasks),
   )
 
-  // I'm avoiding saving task objects multiple times or creating circular references.
-  const projectsToSave = allProjectsAndTaskCategories.map((p) => ({
-    title: p.title,
-  }))
+  const staticNonSaveableProjects = [
+    todayProject,
+    scheduledProject,
+    overdueProject,
+    allTasksProject,
+  ]
+
+  const staticBaseProjectsMap = new Map([
+    [groceryProject.originalTitle, groceryProject],
+    [educationalProject.originalTitle, educationalProject],
+    [personalNotesProject.originalTitle, personalNotesProject],
+  ])
+
+  const projectsToSave = allProjectsAndTaskCategories
+    .filter((p) => !staticNonSaveableProjects.includes(p))
+    .map((p) => {
+      if (p.isStatic) {
+        return {
+          title: p.title,
+          isStatic: true,
+          originalTitle: p.originalTitle,
+        }
+      }
+      return { title: p.title }
+    })
+
   localStorage.setItem(
     'allProjectsAndTaskCategories',
     JSON.stringify(projectsToSave),
@@ -212,6 +284,20 @@ function saveAllData() {
   localStorage.setItem(
     'activeProjectTitle',
     activeProject ? activeProject.title : '',
+  )
+
+  const deletedDefaultRemovableProjectTitles = Array.from(
+    staticBaseProjectsMap.keys(),
+  ).filter((originalTitle) => {
+    const defaultProject = staticBaseProjectsMap.get(originalTitle)
+    return !allProjectsAndTaskCategories.some(
+      (p) => p.originalTitle === originalTitle || p === defaultProject,
+    )
+  })
+
+  localStorage.setItem(
+    'deletedDefaultRemovableProjectTitles',
+    JSON.stringify(deletedDefaultRemovableProjectTitles),
   )
 }
 
@@ -248,27 +334,6 @@ function setupSidebar(
     setActiveProjectAndRender(allTasksProject, allDiv),
   )
 
-  groceryDiv.addEventListener('click', () =>
-    setActiveProjectAndRender(groceryProject, groceryDiv),
-  )
-
-  document
-    .querySelector('.educational')
-    .addEventListener('click', () =>
-      setActiveProjectAndRender(
-        educationalProject,
-        document.querySelector('.educational'),
-      ),
-    )
-  document
-    .querySelector('.personal-notes')
-    .addEventListener('click', () =>
-      setActiveProjectAndRender(
-        personalNotesProject,
-        document.querySelector('.personal-notes'),
-      ),
-    )
-
   addProjectBtnElement.addEventListener('click', () =>
     projectDialog.showModal(),
   )
@@ -291,6 +356,7 @@ function setupSidebar(
   })
 
   loadAllData()
+
   renderSidebarItems()
   updateProjectTaskCounts()
 
@@ -325,29 +391,41 @@ function setupSidebar(
 function renderSidebarItems() {
   document.querySelectorAll('.dynamic-project').forEach((el) => el.remove())
 
-  const staticHtmlProjects = [
+  const systemProjects = [
     todayProject,
     scheduledProject,
     overdueProject,
     allTasksProject,
-    groceryProject,
-    educationalProject,
-    personalNotesProject,
   ]
 
-  const dynamicProjects = allProjectsAndTaskCategories.filter(
-    (p) => !staticHtmlProjects.includes(p),
+  const userManagedProjects = allProjectsAndTaskCategories.filter(
+    (p) => !systemProjects.includes(p),
   )
 
   const addProjectBtn = projectList.querySelector('.add-project')
 
-  dynamicProjects.forEach((project) => {
+  userManagedProjects.forEach((project) => {
     const btn = document.createElement('div')
-    btn.className = 'dynamic-project'
+    if (project.isStatic && project.originalTitle) {
+      btn.classList.add(project.originalTitle.toLowerCase().replace(/\s/g, '-'))
+    }
+    btn.classList.add('dynamic-project')
 
     if (project === activeProject) {
       btn.classList.add('active')
     }
+
+    const popUpImgContainer = document.createElement('div')
+    popUpImgContainer.classList.add('pop-up-btn')
+
+    const popUpImg = document.createElement('img')
+    popUpImg.src = popUpSvg
+    popUpImg.alt = 'project menu svg'
+    popUpImg.width = '25'
+    popUpImg.height = '25'
+
+    popUpImg.addEventListener('click', toggleProjectPopup)
+    popUpImgContainer.appendChild(popUpImg)
 
     const img = document.createElement('img')
     img.src = folderImg
@@ -367,9 +445,12 @@ function renderSidebarItems() {
     btn.appendChild(img)
     btn.appendChild(titleP)
     btn.appendChild(numberP)
+    btn.appendChild(popUpImgContainer)
 
-    btn.addEventListener('click', () => {
-      setActiveProjectAndRender(project, btn)
+    btn.addEventListener('click', (event) => {
+      if (!event.target.closest('.pop-up-btn')) {
+        setActiveProjectAndRender(project, btn)
+      }
     })
 
     projectList.insertBefore(btn, addProjectBtn)
@@ -398,13 +479,11 @@ function setActiveProjectAndRender(projectObj, htmlElement) {
       elementToActivate = document.querySelector('.overdue')
     else if (activeProject === allTasksProject)
       elementToActivate = document.querySelector('.all')
-    else if (activeProject === groceryProject)
-      elementToActivate = document.querySelector('.grocery')
-    else if (activeProject === educationalProject)
-      elementToActivate = document.querySelector('.educational')
-    else if (activeProject === personalNotesProject)
-      elementToActivate = document.querySelector('.personal-notes')
-    else {
+    else if (activeProject.isStatic && activeProject.originalTitle) {
+      elementToActivate = document.querySelector(
+        `.${activeProject.originalTitle.toLowerCase().replace(/\s/g, '-')}`,
+      )
+    } else {
       elementToActivate = projectList
         .querySelector(
           `.dynamic-project p:first-of-type[textContent="${activeProject.title}"]`,
@@ -433,56 +512,18 @@ function setActiveProjectAndRender(projectObj, htmlElement) {
 }
 
 function updateProjectTaskCounts() {
-  const todayNumberElem = document.querySelector('.today .number')
-  if (todayNumberElem) {
-    todayNumberElem.textContent = todayProject
-      .getTasks()
-      .filter((task) => !task.completed).length
-  }
-
-  const scheduledNumberElem = document.querySelector('.schedule .number')
-  if (scheduledNumberElem) {
-    scheduledNumberElem.textContent = scheduledProject
-      .getTasks()
-      .filter((task) => !task.completed).length
-  }
-
-  const overdueNumberElem = document.querySelector('.overdue .number')
-  if (overdueNumberElem) {
-    overdueNumberElem.textContent = overdueProject
-      .getTasks()
-      .filter((task) => !task.completed).length
-  }
-
-  const allNumberElem = document.querySelector('.all .number')
-  if (allNumberElem) {
-    allNumberElem.textContent = allTasksProject
-      .getTasks()
-      .filter((task) => !task.completed).length
-  }
-
-  const groceryNumberElem = document.querySelector('.grocery .number')
-  if (groceryNumberElem) {
-    groceryNumberElem.textContent = groceryProject
-      .getTasks()
-      .filter((task) => !task.completed).length
-  }
-
-  const educationalNumberElem = document.querySelector('.educational .number')
-  if (educationalNumberElem) {
-    educationalNumberElem.textContent = educationalProject
-      .getTasks()
-      .filter((task) => !task.completed).length
-  }
-
-  const personalNotesNumberElem = document.querySelector(
-    '.personal-notes .number',
-  )
-  if (personalNotesNumberElem) {
-    personalNotesNumberElem.textContent = personalNotesProject
-      .getTasks()
-      .filter((task) => !task.completed).length
-  }
+  document.querySelector('.today .number').textContent = todayProject
+    .getTasks()
+    .filter((task) => !task.completed).length
+  document.querySelector('.schedule .number').textContent = scheduledProject
+    .getTasks()
+    .filter((task) => !task.completed).length
+  document.querySelector('.overdue .number').textContent = overdueProject
+    .getTasks()
+    .filter((task) => !task.completed).length
+  document.querySelector('.all .number').textContent = allTasksProject
+    .getTasks()
+    .filter((task) => !task.completed).length
 
   document.querySelectorAll('.dynamic-project').forEach((dynamicDiv) => {
     const title = dynamicDiv.querySelector('p:first-of-type').textContent
@@ -694,4 +735,240 @@ function formatDate(dateString) {
   const date = new Date(dateString + 'T00:00:00')
   const optionsDate = { weekday: 'short', day: 'numeric', month: 'short' }
   return date.toLocaleDateString('en-US', optionsDate)
+}
+
+const sidebarContainer = document.getElementById('sidebar-container')
+
+const popUpDiv = document.createElement('div')
+popUpDiv.classList.add('pop-up')
+
+const firstItem = document.createElement('p')
+firstItem.textContent = 'Rename'
+
+const secondItem = document.createElement('p')
+secondItem.textContent = 'Delete'
+
+secondItem.addEventListener('click', () => {
+  if (projectToRename) {
+    handleDeleteProject(projectToRename)
+    popUpDiv.style.display = 'none'
+  }
+})
+
+popUpDiv.appendChild(firstItem)
+popUpDiv.appendChild(secondItem)
+
+if (!document.body.contains(popUpDiv)) {
+  document.body.appendChild(popUpDiv)
+}
+
+let currentOpenPopupTrigger = null
+let projectToRename = null
+
+function toggleProjectPopup(event) {
+  event.stopPropagation()
+
+  const clickedBtnContainer = event.target.closest('.pop-up-btn')
+  const projectDiv =
+    event.target.closest('.dynamic-project') ||
+    event.target.closest('.projects.test > div')
+
+  if (!clickedBtnContainer || !projectDiv) {
+    return
+  }
+
+  const projectTitleElement = projectDiv.querySelector('p:first-of-type')
+  const projectTitle = projectTitleElement
+    ? projectTitleElement.textContent
+    : ''
+
+  projectToRename = allProjectsAndTaskCategories.find(
+    (p) => p.title === projectTitle,
+  )
+
+  if (!projectToRename) {
+    console.error('Project not found for renaming.')
+    return
+  }
+
+  const nonRenameableProjects = [
+    todayProject,
+    scheduledProject,
+    overdueProject,
+    allTasksProject,
+  ]
+
+  if (nonRenameableProjects.includes(projectToRename)) {
+    alert(`The "${projectToRename.title}" category cannot be renamed.`)
+    popUpDiv.style.display = 'none'
+    currentOpenPopupTrigger = null
+    projectToRename = null
+    return
+  }
+
+  if (
+    currentOpenPopupTrigger === clickedBtnContainer &&
+    popUpDiv.style.display === 'block'
+  ) {
+    popUpDiv.style.display = 'none'
+    currentOpenPopupTrigger = null
+    projectToRename = null
+  } else {
+    if (
+      currentOpenPopupTrigger &&
+      currentOpenPopupTrigger !== clickedBtnContainer
+    ) {
+      popUpDiv.style.display = 'none'
+    }
+
+    popUpDiv.style.display = 'block'
+    currentOpenPopupTrigger = clickedBtnContainer
+    positionPopup()
+  }
+}
+
+function positionPopup() {
+  if (popUpDiv.style.display === 'block' && currentOpenPopupTrigger) {
+    const rect = currentOpenPopupTrigger.getBoundingClientRect()
+
+    const popupLeft = rect.right + window.scrollX + 5
+    const popupTop = rect.top + window.scrollY
+
+    popUpDiv.style.left = `${popupLeft}px`
+    popUpDiv.style.top = `${popupTop}px`
+  }
+}
+
+document.addEventListener('click', (event) => {
+  if (
+    popUpDiv.style.display === 'block' &&
+    !popUpDiv.contains(event.target) &&
+    !event.target.closest('.pop-up-btn')
+  ) {
+    popUpDiv.style.display = 'none'
+    currentOpenPopupTrigger = null
+    projectToRename = null
+  }
+})
+
+window.addEventListener('resize', positionPopup)
+
+window.addEventListener('scroll', positionPopup)
+
+const modifyProjectDialog = document.getElementById('modifyProjectDialog')
+const modifyProjectForm = document.getElementById('modifyProjectForm')
+const closeDialogButton = document.getElementById('closeDialogButton')
+const modifyProjectTitleInput = document.getElementById(
+  'modifyProjectTitleInput',
+)
+
+firstItem.addEventListener('click', () => {
+  if (projectToRename) {
+    modifyProjectTitleInput.value = projectToRename.title
+    modifyProjectDialog.showModal()
+    popUpDiv.style.display = 'none'
+  }
+})
+
+closeDialogButton.addEventListener('click', () => {
+  modifyProjectForm.reset()
+  modifyProjectDialog.close()
+  projectToRename = null
+})
+
+modifyProjectForm.addEventListener('submit', (event) => {
+  event.preventDefault()
+
+  const newTitle = modifyProjectTitleInput.value.trim()
+
+  if (!newTitle) {
+    alert('project title cannot be empty!')
+    return
+  }
+
+  const exists = allProjectsAndTaskCategories.some(
+    (p) =>
+      p.title.toLowerCase() === newTitle.toLowerCase() && p !== projectToRename,
+  )
+  if (exists) {
+    alert(`A project with the title "${newTitle}" already exists!`)
+    return
+  }
+
+  if (projectToRename) {
+    const oldTitle = projectToRename.title
+    projectToRename.title = newTitle
+
+    allApplicationTasks.forEach((task) => {
+      if (task.projectTitle === oldTitle) {
+        task.projectTitle = newTitle
+      }
+    })
+
+    saveAllData()
+    renderSidebarItems()
+    updateProjectTaskCounts()
+
+    if (activeProject === projectToRename) {
+      renderTasks()
+    }
+  }
+
+  modifyProjectDialog.close()
+  modifyProjectForm.reset()
+  projectToRename = null
+})
+
+function handleDeleteProject(projectToDelete) {
+  const nonDeleteableProjects = [
+    todayProject,
+    scheduledProject,
+    overdueProject,
+    allTasksProject,
+  ]
+
+  if (nonDeleteableProjects.includes(projectToDelete)) {
+    alert(`The "${projectToDelete.title}" category cannot be deleted.`)
+    return
+  }
+  const confirmDeletion = confirm(
+    `Are you sure you want to delete the project "${projectToDelete.title}" and all its tasks? This action cannot be undone.`,
+  )
+  if (!confirmDeletion) {
+    return
+  }
+
+  allApplicationTasks = allApplicationTasks.filter(
+    (task) => task.projectTitle !== projectToDelete.title,
+  )
+
+  allProjectsAndTaskCategories = allProjectsAndTaskCategories.filter(
+    (project) => project !== projectToDelete,
+  )
+
+  if (activeProject === projectToDelete) {
+    const newActive =
+      allProjectsAndTaskCategories.find(
+        (p) =>
+          p !== todayProject &&
+          p !== scheduledProject &&
+          p !== overdueProject &&
+          p !== allTasksProject,
+      ) || allTasksProject
+    setActiveProjectAndRender(newActive, null)
+  }
+
+  saveAllData()
+  renderSidebarItems()
+  updateProjectTaskCounts()
+  renderTasks()
+
+  console.log(`Project "${projectToDelete.title}" deleted.`)
+}
+
+function showTaskDetailsModal(task) {
+  console.log('Task Details:', task)
+  alert(
+    `Task: ${task.title}\nDescription: ${task.description}\nDue Date: ${formatDate(task.dueDate)}\nDue Time: ${formatTime(task.dueTime)}\nPriority: ${task.priority}`,
+  )
 }
