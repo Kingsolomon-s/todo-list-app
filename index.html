@@ -44,6 +44,20 @@
           />
         </g>
       </svg>
+      <img
+        src="a145d7f61b41a7204209.svg"
+        class="hamburger-svg"
+        alt="hamburger svg"
+        width="25"
+        height="25"
+      />
+      <img
+        src="7984068c14717aad6c8f.svg"
+        class="cancel-svg"
+        alt="cancel svg"
+        width="25"
+        height="25"
+      />
     </button>
     <div class="container">
       <div id="sidebar-container">
@@ -62,7 +76,7 @@
             </div>
             <div class="sidebar-item schedule">
               <img
-                src="063ea1fccde2fac7797f.svg"
+                src="47ea9fec5224105ac1da.svg"
                 alt="schedule svg"
                 width="25"
                 height="25"
@@ -93,36 +107,7 @@
           </div>
           <div class="projects test">
             <h4>Projects</h4>
-            <div class="sidebar-item grocery">
-              <img
-                src="10b08675dff4ebbb22a9.svg"
-                alt="folder svg"
-                width="25"
-                height="25"
-              />
-              <p>Grocery</p>
-              <p class="number">0</p>
-            </div>
-            <div class="sidebar-item educational">
-              <img
-                src="10b08675dff4ebbb22a9.svg"
-                alt="folder svg"
-                width="25"
-                height="25"
-              />
-              <p>Educational</p>
-              <p class="number">0</p>
-            </div>
-            <div class="sidebar-item personal-notes">
-              <img
-                src="10b08675dff4ebbb22a9.svg"
-                alt="folder svg"
-                width="25"
-                height="25"
-              />
-              <p>Personal Notes</p>
-              <p class="number">0</p>
-            </div>
+
             <div class="add-project"><span>+</span> Add Project</div>
           </div>
         </div>
@@ -132,6 +117,25 @@
         <p class="welcome">Welcome,</p>
         <h2 class="current-project-title"></h2>
       </div>
+    </div>
+    <div>
+      <dialog id="modifyProjectDialog">
+        <form id="modifyProjectForm">
+          <h2>Rename Project</h2>
+          <label>
+            <input
+              id="modifyProjectTitleInput"
+              type="text"
+              name="projectTitle"
+              required
+            /><br />
+          </label>
+          <menu class="modifyProjectMenu">
+            <button type="button" id="closeDialogButton">Cancel</button>
+            <button type="submit">Confirm</button>
+          </menu>
+        </form>
+      </dialog>
     </div>
   </body>
 </html>
