@@ -44,6 +44,20 @@
           />
         </g>
       </svg>
+      <img
+        src="./images/hamburger-menu-svgrepo-com.svg"
+        class="hamburger-svg"
+        alt="hamburger svg"
+        width="25"
+        height="25"
+      />
+      <img
+        src="./images/cancel-svgrepo-com.svg"
+        class="cancel-svg"
+        alt="cancel svg"
+        width="25"
+        height="25"
+      />
     </button>
     <div class="container">
       <div id="sidebar-container">
@@ -52,7 +66,7 @@
             <h4>Tasks</h4>
             <div class="sidebar-item today">
               <img
-                src="./images/schedule-svgrepo-com.svg"
+                src="./images/today-svgrepo-com.svg"
                 alt="today's svg"
                 width="25"
                 height="25"
@@ -93,36 +107,7 @@
           </div>
           <div class="projects test">
             <h4>Projects</h4>
-            <div class="sidebar-item grocery">
-              <img
-                src="./images/folder-file-svgrepo-com.svg"
-                alt="folder svg"
-                width="25"
-                height="25"
-              />
-              <p>Grocery</p>
-              <p class="number">0</p>
-            </div>
-            <div class="sidebar-item educational">
-              <img
-                src="./images/folder-file-svgrepo-com.svg"
-                alt="folder svg"
-                width="25"
-                height="25"
-              />
-              <p>Educational</p>
-              <p class="number">0</p>
-            </div>
-            <div class="sidebar-item personal-notes">
-              <img
-                src="./images/folder-file-svgrepo-com.svg"
-                alt="folder svg"
-                width="25"
-                height="25"
-              />
-              <p>Personal Notes</p>
-              <p class="number">0</p>
-            </div>
+
             <div class="add-project"><span>+</span> Add Project</div>
           </div>
         </div>
@@ -132,6 +117,25 @@
         <p class="welcome">Welcome,</p>
         <h2 class="current-project-title"></h2>
       </div>
+    </div>
+    <div>
+      <dialog id="modifyProjectDialog">
+        <form id="modifyProjectForm">
+          <h2>Rename Project</h2>
+          <label>
+            <input
+              id="modifyProjectTitleInput"
+              type="text"
+              name="projectTitle"
+              required
+            /><br />
+          </label>
+          <menu class="modifyProjectMenu">
+            <button type="button" id="closeDialogButton">Cancel</button>
+            <button type="submit">Confirm</button>
+          </menu>
+        </form>
+      </dialog>
     </div>
   </body>
 </html>
