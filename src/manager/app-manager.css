@@ -213,5 +213,6 @@ span.custom-checkbox-display {
     grid-column: span 2;
     display: grid;
     grid-template-columns: 100px 100px;
+    align-items: center;
   }
 }
