@@ -129,6 +129,117 @@ function loadAllData() {
       allApplicationTasks = []
     }
 
+    if (allApplicationTasks.length === 0) {
+      const today = new Date()
+      const tomorrow = new Date()
+      tomorrow.setDate(today.getDate() + 1)
+      const yesterday = new Date()
+      yesterday.setDate(today.getDate() - 1)
+
+      const formatDate = (date) => date.toISOString().slice(0, 10)
+
+      const defaultTasks = [
+        // Grocery Project Tasks
+        {
+          id: 'grocery-today-1',
+          title: 'Buy Milk',
+          description: 'Check for organic whole milk.',
+          dueDate: formatDate(today),
+          dueTime: '18:00',
+          priority: 'high',
+          completed: false,
+          projectTitle: 'Grocery',
+        },
+        {
+          id: 'grocery-tomorrow-1',
+          title: 'Plan Weekly Meals',
+          description: 'Browse recipes for dinner ideas.',
+          dueDate: formatDate(tomorrow),
+          dueTime: '20:00',
+          priority: 'medium',
+          completed: false,
+          projectTitle: 'Grocery',
+        },
+        {
+          id: 'grocery-overdue-1',
+          title: 'Clean Fridge',
+          description: 'Dispose of expired items.',
+          dueDate: formatDate(yesterday),
+          dueTime: '09:00',
+          priority: 'low',
+          completed: false,
+          projectTitle: 'Grocery',
+        },
+
+        // Educational Project Tasks
+        {
+          id: 'educational-today-1',
+          title: 'Read Coding Article',
+          description: 'Focus on Webpack module bundling.',
+          dueDate: formatDate(today),
+          dueTime: '14:30',
+          priority: 'high',
+          completed: false,
+          projectTitle: 'Educational',
+        },
+        {
+          id: 'educational-tomorrow-1',
+          title: 'Practice JavaScript',
+          description: 'Work on composition pattern exercises.',
+          dueDate: formatDate(tomorrow),
+          dueTime: '17:00',
+          priority: 'medium',
+          completed: false,
+          projectTitle: 'Educational',
+        },
+        {
+          id: 'educational-overdue-1',
+          title: 'Review design patterns Basics',
+          description: 'Revisit design patterns like factory function.',
+          dueDate: formatDate(yesterday),
+          dueTime: '10:00',
+          priority: 'high',
+          completed: false,
+          projectTitle: 'Educational',
+        },
+
+        // Personal Notes Project Tasks
+        {
+          id: 'personal-today-1',
+          title: 'Plan weekend activities',
+          description: 'List fun or relaxing things to do.',
+          dueDate: formatDate(today),
+          dueTime: '22:00',
+          priority: 'low',
+          completed: false,
+          projectTitle: 'Personal Notes',
+        },
+        {
+          id: 'personal-tomorrow-1',
+          title: 'Call Mom',
+          description: 'Catch up with her.',
+          dueDate: formatDate(tomorrow),
+          dueTime: '19:00',
+          priority: 'medium',
+          completed: false,
+          projectTitle: 'Personal Notes',
+        },
+        {
+          id: 'personal-overdue-1',
+          title: 'Organize Digital Photos',
+          description: 'Sort photos from last vacation.',
+          dueDate: formatDate(yesterday),
+          dueTime: '16:00',
+          priority: 'low',
+          completed: false,
+          projectTitle: 'Personal Notes',
+        },
+      ]
+
+      allApplicationTasks.push(...defaultTasks) // Add all default tasks
+      console.log('Default tasks added to allApplicationTasks.')
+    }
+
     const storedProjectStates = localStorage.getItem(
       'allProjectsAndTaskCategories',
     )
@@ -192,9 +303,16 @@ function loadAllData() {
       }
     })
 
-    allProjectsAndTaskCategories = Array.from(
-      new Set(allProjectsAndTaskCategories),
-    )
+    const uniqueProjects = new Set()
+    const tempProjects = []
+    allProjectsAndTaskCategories.forEach((p) => {
+      if (!uniqueProjects.has(p)) {
+        uniqueProjects.add(p)
+        tempProjects.push(p)
+      }
+    })
+
+    allProjectsAndTaskCategories = tempProjects
 
     const lastActiveProjectTitle = localStorage.getItem('activeProjectTitle')
     if (lastActiveProjectTitle) {
