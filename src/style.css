@@ -28,6 +28,16 @@ body {
   top: 15px;
   z-index: 1100;
   left: 20px;
+  transition: all 0.3s ease;
+
+  .sidebar-left {
+    width: 25px;
+    aspect-ratio: 1;
+    background-image: url('./images/sidebar-left-svgrepo-com.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
 }
 
 .hamburger-btn:hover {
@@ -262,8 +272,132 @@ div.add-project {
 .add-task-btn:hover {
   background-color: #000;
 }
-.hamburger-btn .hamburger-svg {
+.hamburger-btn .hamburger-svg,
+.hamburger-btn .cancel-svg {
   display: none;
+}
+
+.hamburger-btn .cancel-svg {
+  width: 25px;
+  aspect-ratio: 1;
+  background-image: url('./images/cancel-svgrepo-com.svg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.hamburger-btn .hamburger-svg {
+  width: 25px;
+  aspect-ratio: 1;
+  background-image: url('./images/hamburger-menu-svgrepo-com.svg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+#modifyTodoDialog {
+  margin: auto;
+  padding: 1em;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  border: none;
+  border-radius: 10px;
+  height: 500px;
+  width: 350px;
+  background-color: #444;
+  color: #fff;
+}
+#modifyTodoForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+#modifyTodoForm h2 {
+  font-size: 1.4rem;
+  text-align: center;
+  color: #bbb;
+}
+menu.modifyTodoMenu {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+menu.modifyTodoMenu > * {
+  padding: 10px 10px;
+  flex: 1;
+  border-radius: 8px;
+  border: none;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  color: #eee;
+  font-size: 0.9rem;
+}
+
+.modifyTodoMenu > :first-child {
+  background-color: #dc3545;
+}
+.modifyTodoMenu > :last-child {
+  background-color: #28a745;
+}
+.modifyTodoMenu > :first-child:hover,
+.modifyTodoMenu > :first-child:focus {
+  background-color: #c82333;
+}
+.modifyTodoMenu > :last-child:hover,
+.modifyTodoMenu > :last-child:focus {
+  background-color: #218838;
+}
+
+label {
+  margin: 1rem 0 0.5rem;
+  width: 100%;
+  color: #bbb;
+  font-size: 1rem;
+  font-family: 'lumanosimo';
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.modifyLabel:last-of-type {
+  display: flex;
+  flex-direction: row;
+}
+.modifyLabel:last-of-type > * {
+  flex: 1;
+  border: none;
+  outline: none;
+  border-top-right-radius: 4px;
+  border-top-left-radius: 4px;
+}
+
+.modifyInput {
+  border-radius: 6px;
+  color: #bbb;
+  border: none;
+  background-color: #444;
+  padding: 10px 10px 10px 20px;
+  width: 100%;
+  font-size: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+.modifyInput:focus {
+  background-color: #333;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+  outline: none;
+  color: #fff;
+}
+textarea.modifyInput {
+  resize: none;
+}
+.modifySelect {
+  background-color: #444;
+
+  color: #bbb;
+}
+.modifySelect:focus {
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
 }
 
 @media (max-width: 768px) {
@@ -284,8 +418,11 @@ div.add-project {
   .add-task-btn {
     margin-bottom: 50px;
   }
-  .hamburger-btn svg {
+  .hamburger-btn .sidebar-left {
     display: none;
+  }
+  #hamburger .cancel-svg {
+    display: block;
   }
 
   #hamburger.open {
