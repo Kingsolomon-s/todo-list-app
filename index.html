@@ -7,57 +7,9 @@
   <script defer src="main.js"></script></head>
   <body>
     <button id="hamburger" class="hamburger-btn" aria-label="Toggle menu">
-      <svg
-        width="25px"
-        height="25px"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <g id="SVGRepo_bgCarrier" stroke-width="0" />
-        <g
-          id="SVGRepo_tracerCarrier"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-        <g id="SVGRepo_iconCarrier">
-          <rect
-            x="3"
-            y="3"
-            width="18"
-            height="18"
-            rx="3"
-            stroke="#000000"
-            stroke-width="0.528"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-          <line
-            x1="9"
-            y1="4"
-            x2="9"
-            y2="20"
-            stroke="#000000"
-            stroke-width="0.528"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </g>
-      </svg>
-      <img
-        src="a145d7f61b41a7204209.svg"
-        class="hamburger-svg"
-        alt="hamburger svg"
-        width="25"
-        height="25"
-      />
-      <img
-        src="7984068c14717aad6c8f.svg"
-        class="cancel-svg"
-        alt="cancel svg"
-        width="25"
-        height="25"
-      />
+      <div class="sidebar-left"></div>
+      <div class="cancel-svg"></div>
+      <div class="hamburger-svg"></div>
     </button>
     <div class="container">
       <div id="sidebar-container">
@@ -118,24 +70,64 @@
         <h2 class="current-project-title"></h2>
       </div>
     </div>
-    <div>
-      <dialog id="modifyProjectDialog">
-        <form id="modifyProjectForm">
-          <h2>Rename Project</h2>
-          <label>
-            <input
-              id="modifyProjectTitleInput"
-              type="text"
-              name="projectTitle"
-              required
-            /><br />
-          </label>
-          <menu class="modifyProjectMenu">
-            <button type="button" id="closeDialogButton">Cancel</button>
-            <button type="submit">Confirm</button>
-          </menu>
-        </form>
-      </dialog>
-    </div>
+
+    <dialog id="modifyProjectDialog">
+      <form id="modifyProjectForm">
+        <h2>Rename Project</h2>
+        <label>
+          <input
+            id="modifyProjectTitleInput"
+            type="text"
+            name="projectTitle"
+            required
+          /><br />
+        </label>
+        <menu class="modifyProjectMenu">
+          <button type="button" id="closeDialogButton">Cancel</button>
+          <button type="submit">Confirm</button>
+        </menu>
+      </form>
+    </dialog>
+
+    <dialog id="modifyTodoDialog">
+      <form id="modifyTodoForm">
+        <h2>Edit Task</h2>
+        <label class="modifyLabel" for="taskTitle">Task Title:</label>
+        <input
+          class="modifyInput"
+          type="text"
+          id="taskTitle"
+          name="taskTitle"
+          required
+        />
+
+        <label class="modifyLabel" for="description">Description:</label>
+        <textarea
+          id="description"
+          name="description"
+          class="modifyInput"
+        ></textarea>
+
+        <label class="modifyLabel" for="dueDate">Due Date:</label>
+        <input class="modifyInput" type="date" id="dueDate" name="dueDate" />
+
+        <label class="modifyLabel" for="dueTime">Due Time:</label>
+        <input class="modifyInput" type="time" id="dueTime" name="dueTime" />
+
+        <label class="modifyLabel" for="priority"
+          >Priority:
+          <select class="modifySelect" id="priority" name="priority">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </label>
+
+        <menu class="modifyTodoMenu">
+          <button type="button" id="deleteTaskButton">Delete Task</button>
+          <button type="submit">Save Changes</button>
+        </menu>
+      </form>
+    </dialog>
   </body>
 </html>
