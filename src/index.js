@@ -25,6 +25,8 @@ function toggleSidebar() {
 }
 
 overlay.addEventListener('click', () => {
+  toggleButton.classList.remove('open')
+  toggleButton.classList.add('close')
   sideBar.classList.add('close')
   sideBar.classList.add('hidden-children')
   overlay.classList.remove('active')

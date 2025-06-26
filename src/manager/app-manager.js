@@ -6,7 +6,7 @@ import timeSvg from './images/alarm-clock-svgrepo-com.svg'
 import popUpSvg from '../images/menu-dots-svgrepo-com.svg'
 import './app-manager.css'
 
-let allApplicationTasks = []
+export let allApplicationTasks = []
 let allProjectsAndTaskCategories = []
 let activeProject = null
 
@@ -195,25 +195,6 @@ function loadAllData() {
     allProjectsAndTaskCategories = Array.from(
       new Set(allProjectsAndTaskCategories),
     )
-
-    allProjectsAndTaskCategories.forEach((project) => {
-      const isSystemCategory = [
-        todayProject,
-        scheduledProject,
-        overdueProject,
-        allTasksProject,
-      ].includes(project)
-
-      if (!isSystemCategory) {
-        if (project.tasks) {
-          project.tasks = []
-        }
-
-        allApplicationTasks
-          .filter((task) => task.projectTitle === project.title)
-          .forEach((task) => project.addTask(task))
-      }
-    })
 
     const lastActiveProjectTitle = localStorage.getItem('activeProjectTitle')
     if (lastActiveProjectTitle) {
@@ -966,9 +947,95 @@ function handleDeleteProject(projectToDelete) {
   console.log(`Project "${projectToDelete.title}" deleted.`)
 }
 
+const modifyTodoDialog = document.getElementById('modifyTodoDialog')
+const modifyTodoForm = document.getElementById('modifyTodoForm')
+console.log('yay')
+
+const modifyTaskInput = document.getElementById('taskTitle')
+const modifyTaskDescriptionInput = document.getElementById('description')
+const modifyTaskDueDateInput = document.getElementById('dueDate')
+const modifyTaskDueTimeInput = document.getElementById('dueTime')
+const modifyTaskPriorityInput = document.getElementById('priority')
+const deleteTaskButton = document.getElementById('deleteTaskButton')
+
+let currentTaskBeingEdited = null
+
 function showTaskDetailsModal(task) {
-  console.log('Task Details:', task)
-  alert(
-    `Task: ${task.title}\nDescription: ${task.description}\nDue Date: ${formatDate(task.dueDate)}\nDue Time: ${formatTime(task.dueTime)}\nPriority: ${task.priority}`,
-  )
+  currentTaskBeingEdited = task
+
+  modifyTaskInput.value = task.title || ''
+  modifyTaskDescriptionInput.value = task.description || ''
+  modifyTaskDueDateInput.value = task.dueDate || ''
+  modifyTaskDueTimeInput.value = task.dueTime || ''
+  modifyTaskPriorityInput.value = task.priority || 'low'
+
+  modifyTodoDialog.showModal()
 }
+
+modifyTodoForm.addEventListener('submit', (event) => {
+  event.preventDefault()
+
+  if (!currentTaskBeingEdited) {
+    alert('No task selected for editing.')
+    return
+  }
+
+  const updatedTitle = modifyTaskInput.value.trim()
+  const updatedDescription = modifyTaskDescriptionInput.value.trim()
+  const updatedDueDate = modifyTaskDueDateInput.value
+  const updatedDueTime = modifyTaskDueTimeInput.value
+  const updatedPriority = modifyTaskPriorityInput.value
+
+  if (!updatedTitle) {
+    alert('Task title cannot be empty!')
+    return
+  }
+
+  const taskIndex = allApplicationTasks.findIndex(
+    (t) => t.id === currentTaskBeingEdited.id,
+  )
+
+  if (taskIndex !== -1) {
+    allApplicationTasks[taskIndex] = {
+      ...allApplicationTasks[taskIndex],
+      title: updatedTitle,
+      description: updatedDescription,
+      dueDate: updatedDueDate,
+      dueTime: updatedDueTime,
+      priority: updatedPriority,
+    }
+  }
+
+  console.log('Task after update:', allApplicationTasks[taskIndex])
+  console.log('Active project tasks after update:', activeProject.getTasks())
+
+  saveAllData()
+  renderTasks()
+  modifyTodoDialog.close()
+  modifyTodoForm.reset()
+  currentTaskBeingEdited = null
+})
+
+deleteTaskButton.addEventListener('click', () => {
+  if (!currentTaskBeingEdited) {
+    alert('No task selected for deletion.')
+    return
+  }
+
+  const confirmDelete = confirm(
+    `Are you sure you want to delete the task "${currentTaskBeingEdited.title}"?`,
+  )
+
+  if (confirmDelete) {
+    allApplicationTasks = allApplicationTasks.filter(
+      (task) => task.id !== currentTaskBeingEdited.id,
+    )
+
+    saveAllData()
+    updateProjectTaskCounts()
+    renderTasks()
+    modifyTodoDialog.close()
+    modifyTodoForm.reset()
+    currentTaskBeingEdited = null
+  }
+})
